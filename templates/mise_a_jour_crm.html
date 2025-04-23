@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOZ - Mise à jour CRM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .input-error {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .save-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .floating-help {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .floating-help:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <!-- En-tête avec fil d'Ariane -->
+        <nav class="text-sm text-gray-500 mb-4">
+            <ol class="list-none p-0 inline-flex">
+                <li class="flex items-center">
+                    <a href="#" class="hover:text-blue-600">Accueil</a>
+                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </li>
+                <li class="flex items-center">
+                    <a href="#" class="hover:text-blue-600">Fournisseurs</a>
+                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </li>
+                <li class="text-gray-700 font-medium">Mise à jour CRM</li>
+            </ol>
+        </nav>
+
+        <!-- Formulaire principal -->
+        <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Mise à jour CRM</h1>
+                <span id="saveStatus" class="text-sm text-gray-500"></span>
+            </div>
+
+            <form id="crmForm" method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Colonne gauche -->
+                    <div class="space-y-4">
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Nom du fournisseur *
+                            </label>
+                            <div class="relative">
+                                <input type="text" 
+                                       name="nom" 
+                                       value="{{ fournisseur.nom }}"
+                                       class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       required>
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Téléphone
+                            </label>
+                            <div class="relative">
+                                <input type="tel" 
+                                       name="telephone" 
+                                       value="{{ fournisseur.telephone }}"
+                                       class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       pattern="[0-9]{10}">
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Mobile
+                            </label>
+                            <div class="relative">
+                                <input type="tel" 
+                                       name="mobile" 
+                                       value="{{ fournisseur.mobile }}"
+                                       class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       pattern="[0-9]{10}">
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Email *
+                            </label>
+                            <div class="relative">
+                                <input type="email" 
+                                       name="email" 
+                                       value="{{ fournisseur.email }}"
+                                       class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       required>
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Colonne droite -->
+                    <div class="space-y-4">
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Site Web
+                            </label>
+                            <div class="relative">
+                                <input type="url" 
+                                       name="site_web" 
+                                       value="{{ fournisseur.site_web }}"
+                                       class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Type d'activité *
+                            </label>
+                            <div class="relative">
+                                <select name="type_activite" 
+                                        class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required>
+                                    <option value="">Sélectionnez un type</option>
+                                    <option value="production" {{ 'selected' if fournisseur.type_activite == 'production' }}>Production</option>
+                                    <option value="distribution" {{ 'selected' if fournisseur.type_activite == 'distribution' }}>Distribution</option>
+                                    <option value="service" {{ 'selected' if fournisseur.type_activite == 'service' }}>Service</option>
+                                </select>
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Produit principal *
+                            </label>
+                            <div class="relative">
+                                <input type="text" 
+                                       name="produit_principal" 
+                                       value="{{ fournisseur.produit_principal }}"
+                                       class="form-input w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       required>
+                                <div class="validation-message"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" 
+                            onclick="confirmerAnnulation()"
+                            class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition duration-150">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-150 flex items-center">
+                        <span>Confirmer</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bouton d'aide flottant -->
+        <button class="floating-help bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700"
+                onclick="toggleHelp()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Validation en temps réel
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', function() {
+                validateField(this);
+                autoSave();
+            });
+        });
+
+        // Validation d'un champ
+        function validateField(field) {
+            const validationMessage = field.parentElement.querySelector('.validation-message');
+            
+            if (field.validity.valid) {
+                field.classList.remove('border-red-500');
+                validationMessage.textContent = '';
+                return true;
+            } else {
+                field.classList.add('border-red-500');
+                if (field.validity.valueMissing) {
+                    validationMessage.textContent = 'Ce champ est requis';
+                } else if (field.validity.typeMismatch) {
+                    validationMessage.textContent = 'Format invalide';
+                } else if (field.validity.patternMismatch) {
+                    validationMessage.textContent = 'Format incorrect';
+                }
+                return false;
+            }
+        }
+
+        // Auto-sauvegarde
+        let autoSaveTimeout;
+        function autoSave() {
+            clearTimeout(autoSaveTimeout);
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.textContent = 'Modifications non sauvegardées...';
+            
+            autoSaveTimeout = setTimeout(() => {
+                saveStatus.textContent = 'Tout est sauvegardé';
+                setTimeout(() => {
+                    saveStatus.textContent = '';
+                }, 2000);
+            }, 1000);
+        }
+
+        // Confirmation d'annulation
+        function confirmerAnnulation() {
+            if (document.getElementById('saveStatus').textContent.includes('non sauvegardées')) {
+                if (confirm('Des modifications non sauvegardées seront perdues. Voulez-vous vraiment annuler ?')) {
+                    history.back();
+                }
+            } else {
+                history.back();
+            }
+        }
+
+        // Gestion du formulaire
+        document.getElementById('crmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Valider tous les champs
+            let isValid = true;
+            this.querySelectorAll('.form-input').forEach(input => {
+                if (!validateField(input)) {
+                    isValid = false;
+                    input.classList.add('input-error');
+                    setTimeout(() => {
+                        input.classList.remove('input-error');
+                    }, 500);
+                }
+            });
+
+            if (isValid) {
+                // Simuler l'envoi du formulaire
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalContent = submitButton.innerHTML;
+                submitButton.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Enregistrement...
+                `;
+                
+                setTimeout(() => {
+                    submitButton.innerHTML = originalContent;
+                    // Afficher une notification de succès
+                    const notification = document.createElement('div');
+                    
+                    notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in';
+                    notification.innerHTML = `
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Modifications enregistrées avec succès</span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                }, 1000);
+            }
+        });
+
+        // Gestion du bouton d'aide
+        function toggleHelp() {
+            const helpContent = document.createElement('div');
+            helpContent.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4';
+            helpContent.innerHTML = `
+                <div class="bg-white rounded-xl p-6 max-w-lg w-full animate-fade-in">
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-xl font-bold">Aide</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <p class="text-gray-600">
+                            Les champs marqués d'un astérisque (*) sont obligatoires.
+                        </p>
+                        <h3 class="font-medium">Validation des champs :</h3>
+                        <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                            <li>Le numéro de téléphone doit contenir 10 chiffres</li>
+                            <li>L'email doit être dans un format valide</li>
+                            <li>Le site web doit commencer par http:// ou https://</li>
+                        </ul>
+                        <p class="text-gray-600">
+                            Les modifications sont automatiquement sauvegardées lors de la saisie.
+                        </p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(helpContent);
+        }
+    </script>
+</body>
+</html>

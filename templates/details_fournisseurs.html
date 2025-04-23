@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOZ - Détails Fournisseur</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .info-card {
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .copy-tooltip {
+            display: none;
+            position: absolute;
+            background: #1a1a1a;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        .info-item:hover .copy-tooltip {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <!-- En-tête -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 animate-fade-in">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="flex items-center">
+                        <h1 class="text-3xl font-bold text-gray-900">{{ fournisseur.nom }}</h1>
+                        <span class="ml-4 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            Actif
+                        </span>
+                    </div>
+                    <p class="text-gray-500 mt-2">ID: #{{ fournisseur.id }}</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="exporterPDF()" class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-150">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Exporter
+                    </button>
+                    <button onclick="verifierExistence()" class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Vérifier l'existence
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Informations générales -->
+            <div class="info-card bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Informations générales
+                </h2>
+                <dl class="space-y-4">
+                    <div class="info-item relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <dt class="text-sm text-gray-600">Téléphone</dt>
+                        <dd class="mt-1 font-medium flex items-center">
+                            {{ fournisseur.telephone }}
+                            <button onclick="copierTexte('{{ fournisseur.telephone }}')" class="ml-2 text-blue-600 hover:text-blue-800">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                            <span class="copy-tooltip">Copier</span>
+                        </dd>
+                    </div>
+                    <div class="info-item relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <dt class="text-sm text-gray-600">Email</dt>
+                        <dd class="mt-1 font-medium flex items-center">
+                            {{ fournisseur.email }}
+                            <a href="mailto:{{ fournisseur.email }}" class="ml-2 text-blue-600 hover:text-blue-800">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </a>
+                        </dd>
+                    </div>
+                    <div class="info-item relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <dt class="text-sm text-gray-600">Site Web</dt>
+                        <dd class="mt-1 font-medium">
+                            <a href="{{ fournisseur.site_web }}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                                {{ fournisseur.site_web }}
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                            </a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Activité -->
+            <div class="info-card bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Activité
+                </h2>
+                <dl class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <dt class="text-sm text-gray-600">Type d'activité</dt>
+                        <dd class="mt-1 font-medium">{{ fournisseur.type_activite }}</dd>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <dt class="text-sm text-gray-600">Produit principal</dt>
+                        <dd class="mt-1 font-medium">{{ fournisseur.produit_principal }}</dd>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <dt class="text-sm text-gray-600">Marché principal</dt>
+                        <dd class="mt-1 font-medium">{{ fournisseur.marche_principal }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="mt-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-6 h-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Contact
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <dt class="text-sm text-gray-600">Nom complet</dt>
+                            <dd class="mt-1 font-medium">{{ fournisseur.contact_prenom }} {{ fournisseur.contact_nom }}</dd>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <dt class="text-sm text-gray-600">Fonction</dt>
+                            <dd class="mt-1 font-medium">{{ fournisseur.contact_fonction }}</dd>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <dt class="text-sm text-gray-600">Téléphone direct</dt>
+                            <dd class="mt-1 font-medium flex items-center">
+                                {{ fournisseur.contact_telephone }}
+                                <a href="tel:{{ fournisseur.contact_telephone }}" class="ml-2 text-blue-600 hover:text-blue-800">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                    </svg>
+                                </a>
+                            </dd>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <dt class="text-sm text-gray-600">Email</dt>
+                            <dd class="mt-1 font-medium flex items-center">
+                                {{ fournisseur.contact_email }}
+                                
+<a href="mailto:{{ fournisseur.contact_email }}" class="ml-2 text-blue-600 hover:text-blue-800">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+    </svg>
+</a>
+</dd>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Fonction pour copier du texte
+function copierTexte(texte) {
+navigator.clipboard.writeText(texte).then(() => {
+// Afficher une notification de succès
+const notification = document.createElement('div');
+notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in';
+notification.textContent = 'Texte copié !';
+document.body.appendChild(notification);
+
+// Supprimer la notification après 2 secondes
+setTimeout(() => {
+notification.remove();
+}, 2000);
+});
+}
+
+// Fonction pour exporter en PDF
+function exporterPDF() {
+// Simuler le chargement
+const button = event.currentTarget;
+const originalText = button.innerHTML;
+button.innerHTML = `
+<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+Export en cours...
+`;
+
+// Simuler un délai de traitement
+setTimeout(() => {
+button.innerHTML = originalText;
+// Ici, ajoutez la logique réelle d'export PDF
+}, 2000);
+}
+
+// Fonction pour vérifier l'existence
+function verifierExistence() {
+const button = event.currentTarget;
+const originalText = button.innerHTML;
+button.innerHTML = `
+<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+Vérification...
+`;
+
+// Simuler une vérification
+setTimeout(() => {
+button.innerHTML = originalText;
+// Afficher le résultat dans une modal ou une notification
+const notification = document.createElement('div');
+notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in';
+notification.textContent = 'Fournisseur vérifié et actif';
+document.body.appendChild(notification);
+
+setTimeout(() => {
+notification.remove();
+}, 3000);
+}, 2000);
+}
+
+// Initialisation des tooltips et autres fonctionnalités au chargement
+document.addEventListener('DOMContentLoaded', () => {
+// Ajouter des effets de hover sur les cartes
+const cards = document.querySelectorAll('.info-card');
+cards.forEach(card => {
+card.addEventListener('mouseenter', () => {
+card.style.transform = 'translateY(-2px)';
+});
+card.addEventListener('mouseleave', () => {
+card.style.transform = 'translateY(0)';
+});
+});
+});
+</script>
+
+</body>
+</html>

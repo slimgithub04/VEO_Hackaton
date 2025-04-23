@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOZ - Vérification des fournisseurs</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .supplier-item {
+            transition: all 0.3s ease;
+        }
+        
+        .supplier-item:hover {
+            transform: translateX(5px);
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .action-button {
+            transition: all 0.2s ease;
+            opacity: 0.8;
+        }
+        
+        .supplier-item:hover .action-button {
+            opacity: 1;
+            transform: translateX(-5px);
+        }
+        
+        .status-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .supplier-item:hover .status-indicator {
+            transform: scale(1.2);
+        }
+
+        .refresh-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .alert-animation {
+            animation: alertPulse 2s infinite;
+        }
+
+        @keyframes alertPulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <!-- En-tête avec fil d'Ariane -->
+        <nav class="text-sm text-gray-500 mb-4">
+            <ol class="list-none p-0 inline-flex">
+                <li class="flex items-center">
+                    <a href="#" class="hover:text-blue-600">Accueil</a>
+                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </li>
+                <li class="text-gray-700 font-medium">Vérification des fournisseurs</li>
+            </ol>
+        </nav>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Vérification de l'existence des fournisseurs</h1>
+                <button onclick="refreshList()" 
+                        class="p-2 hover:bg-gray-100 rounded-full transition-all duration-200 flex items-center"
+                        id="refreshButton">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Fournisseurs existants -->
+                <div>
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <span>Fournisseurs existants dans le CRM</span>
+                        <span id="existingCount" class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full"></span>
+                    </h2>
+                    <div class="bg-green-50 p-4 rounded-md border border-green-100">
+                        {% if fournisseurs_existants %}
+                        <ul class="space-y-2">
+                            {% for fournisseur in fournisseurs_existants %}
+                            <li class="supplier-item flex items-center p-2 rounded-md">
+                                <span class="status-indicator text-green-600 mr-2">✓</span>
+                                <span class="flex-grow">{{ fournisseur.nom }}</span>
+                                <a href="{{ url_for('mise_a_jour_crm', id=fournisseur.id) }}" 
+                                   class="action-button ml-4 text-blue-600 hover:text-blue-800 flex items-center">
+                                    <span>Mettre à jour</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-gray-600 italic">Aucun fournisseur existant trouvé.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Fournisseurs non existants -->
+                <div>
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <span>Fournisseurs non présents dans le CRM</span>
+                        <span id="missingCount" class="ml-2 bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full"></span>
+                    </h2>
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-100">
+                        {% if fournisseurs_non_existants %}
+                        <ul class="space-y-2">
+                            {% for fournisseur in fournisseurs_non_existants %}
+                            <li class="supplier-item flex items-center p-2 rounded-md">
+                                <span class="status-indicator text-gray-600 mr-2">●</span>
+                                <span class="flex-grow">{{ fournisseur }}</span>
+                                <a href="{{ url_for('ajouter_fournisseur') }}?nom={{ fournisseur }}" 
+                                   class="action-button ml-4 text-blue-600 hover:text-blue-800 flex items-center">
+                                    <span>Ajouter</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-gray-600 italic">Tous les fournisseurs existent déjà dans le CRM.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button onclick="history.back()" 
+                        class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Retour
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mettre à jour les compteurs
+        function updateCounters() {
+            const existingCount = document.getElementById('existingCount');
+            const missingCount = document.getElementById('missingCount');
+            
+            if (existingCount) {
+                const count = document.querySelectorAll('.bg-green-50 li').length;
+                existingCount.textContent = count;
+            }
+            
+            if (missingCount) {
+                const count = document.querySelectorAll('.bg-gray-50 li').length;
+                missingCount.textContent = count;
+            }
+        }
+
+        // Rafraîchir la liste
+        function refreshList() {
+            const button = document.getElementById('refreshButton');
+            button.querySelector('svg').classList.add('refresh-spin');
+            
+            // Simuler un chargement
+            setTimeout(() => {
+                button.querySelector('svg').classList.remove('refresh-spin');
+                
+                // Afficher une notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in';
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>Liste mise à jour avec succès</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }, 1000);
+        }
+
+        // Initialiser les compteurs au chargement
+        document.addEventListener('DOMContentLoaded', updateCounters);
+    </script>
+</body>
+</html>

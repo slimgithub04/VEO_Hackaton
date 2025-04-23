@@ -1,0 +1,3 @@
+nom,telephone,mobile,email,site_web,source,micro_famille,nature_produit,type_activite,siret,activite_principale,produit_principal,marche_principal,systeme_production,possede_marque,marque_client,licence
+"Example Company 1","+33123456789","+33612345678","contact@example1.com","www.example1.com","Direct","Electronics","Components","Manufacturing","12345678901234","Electronic Components","Semiconductors","Automotive","Custom",true,"Brand X","ISO 9001"
+"Example Company 2","+33198765432","+33687654321","info@example2.com","www.example2.com","LinkedIn","Software","Services","Development","98765432109876","Software Development","Web Applications","B2B","Agile",false,"","ISO 27001"
