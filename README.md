@@ -6,7 +6,7 @@
 - [Technical Documentation](./TECHNICAL.md)
 
 ## 🎯 About The Project
-An advanced web scraping and data intelligence platform developed during the VEO Hackathon. Built by Selim Manai, this platform revolutionizes supplier data management through intelligent web scraping and automated data processing.
+An advanced web scraping and data intelligence platform developed during the VEO Hackathon. Led by Selim Manai and built with an amazing team, this platform revolutionizes supplier data management through intelligent web scraping and automated data processing.
 
 ### Core Features
 - 🔄 Automated web scraping with intelligent retry mechanisms
@@ -15,6 +15,23 @@ An advanced web scraping and data intelligence platform developed during the VEO
 - 🎯 Advanced company analysis and categorization
 - 🔍 Multi-criteria search capabilities
 - 📈 Interactive data visualization and reporting
+
+## Team Members & Contributors
+- **Selim Manai** - Project Lead & Backend Development
+  - 📧 Email: slimmenei20@gmail.com
+  - 💼 LinkedIn: [Selim Manai](https://www.linkedin.com/in/selim-manai-186a4932a/)
+
+- **Team Members**:
+  - **Name 1** - Frontend Development & UI/UX Design
+  - **Name 2** - Data Processing & Analytics
+  - **Name 3** - Infrastructure & DevOps
+  - **Name 4** - Testing & Quality Assurance
+
+### 🌟 Key Contributions
+- Frontend Team: Developed intuitive user interfaces and responsive design
+- Backend Team: Implemented robust scraping algorithms and data processing
+- DevOps Team: Set up CI/CD pipeline and monitoring infrastructure
+- QA Team: Ensured high quality and reliability through comprehensive testing
 
 ## 🚀 Getting Started
 
@@ -144,7 +161,16 @@ For technical support or inquiries:
 
 ## 🏆 Acknowledgments
 - Built during VEO Hackathon 2024
-- Special thanks to the mentors and organizers
+- Special thanks to our amazing team members who contributed their expertise
+- Thanks to the mentors and organizers for their guidance and support
+- Grateful to our beta testers for their valuable feedback
+
+## 🤝 Team Values
+- Collaborative Development
+- Knowledge Sharing
+- Code Quality
+- Continuous Learning
+- Open Communication
 
 ---
-Made with 🤖 and ❤️ by Selim Manai
+Developed with 🤖 and ❤️ by the VEO Hackathon Team
